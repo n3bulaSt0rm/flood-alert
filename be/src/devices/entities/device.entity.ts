@@ -5,18 +5,18 @@ import { StateHistory } from "../../histories/entities/state-history.entity";
 
 @Entity('devices')
 export class DeviceEntity extends AbstractAuditingEntity {
-  @Column({type: 'varchar', name: 'device_name', unique: true})
+  @Column({ type: 'varchar', name: 'device_name', unique: true })
   deviceName: string;
 
-  @Column({type: 'varchar', name: 'embed_id', unique: true})
+  @Column({ type: 'varchar', name: 'embed_id', unique: true })
   embedId: string;
 
-  @Column({type: 'jsonb', nullable: true})
+  @Column({ type: 'jsonb', nullable: true })
   location: DeviceLocationType;
 
   @OneToMany(() => StateHistory, (history) => history.device, {
     cascade: true,
-    nullable: true
+    nullable: true,
   })
   stateHistories: StateHistory[];
 }

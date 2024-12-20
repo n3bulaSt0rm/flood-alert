@@ -6,11 +6,12 @@ import { CreateDeviceDto, UpdateDeviceDto } from './dto/device.dto';
 
 @Injectable()
 export class DevicesService {
-  private TAG: string = 'DeviceService'
+  private TAG: string = 'DeviceService';
+
   constructor(
     @InjectRepository(DeviceEntity)
-    private readonly deviceRepository: Repository<DeviceEntity>
-  ){}
+    private readonly deviceRepository: Repository<DeviceEntity>,
+  ) {}
 
   public async createDevice(dto: CreateDeviceDto): Promise<DeviceEntity> {
     Logger.debug('Create Device', this.TAG);
@@ -19,7 +20,7 @@ export class DevicesService {
 
   public async getDevice(options: FindOneOptions<DeviceEntity>): Promise<DeviceEntity | null> {
     Logger.debug('Get Device', this.TAG);
-    return await this.deviceRepository.findOne(options)
+    return await this.deviceRepository.findOne(options);
   }
 
   public async getDevices(options?: FindManyOptions<DeviceEntity>): Promise<DeviceEntity[]> {
@@ -31,15 +32,15 @@ export class DevicesService {
     Logger.debug('Update Device', this.TAG);
     const device = await this.getDevice({
       where: {
-        id: dto.id
-      }
+        id: dto.id,
+      },
     });
-    if(!device) {
+    if (!device) {
       throw new NotFoundException(`Device ${dto.id} not found!`);
     }
     const deviceUpdated = {
       ...device,
-      ...dto
+      ...dto,
     };
     return await this.deviceRepository.save(deviceUpdated);
   }
@@ -48,10 +49,10 @@ export class DevicesService {
     Logger.debug('Delete Device', this.TAG);
     const device = await this.getDevice({
       where: {
-        id: id
-      }
+        id: id,
+      },
     });
-    if(!device) {
+    if (!device) {
       throw new NotFoundException(`Device ${id} not found!`);
     }
     return await this.deviceRepository.delete(id);

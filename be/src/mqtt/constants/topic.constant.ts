@@ -1,1 +1,1 @@
-export const WEATHER_TOPIC = 'ddlong07/iot/weather';
+export const FLOOD_ALERT_TOPIC = 'flood';

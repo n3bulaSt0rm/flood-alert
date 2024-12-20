@@ -5,8 +5,8 @@ import { connect, MqttClient } from 'mqtt';
 import { configuration } from 'src/config/configuration';
 import { DevicesService } from 'src/devices/devices.service';
 import { HistoriesService } from 'src/histories/histories.service';
-import { WEATHER_TOPIC } from './constants/topic.constant';
-import { WeatherType } from './types/weather.type';
+import { FLOOD_ALERT_TOPIC } from './constants/topic.constant';
+import { FloodType } from './types/flood.type';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StateHistory } from 'src/histories/entities/state-history.entity';
 import { Repository } from 'typeorm';
@@ -41,7 +41,7 @@ export class MqttService {
       Logger.verbose("Connected to CloudMQTT");
     });
 
-    this.mqttClient.subscribe(WEATHER_TOPIC, (err: any) => {
+    this.mqttClient.subscribe(FLOOD_ALERT_TOPIC, (err: any) => {
       Logger.error(err);
     })
 
@@ -51,8 +51,8 @@ export class MqttService {
 
     this.mqttClient.on("message", async (topic: any, payload: any) => {
       try {
-        const message: WeatherType = JSON.parse(payload.toString());
-        if(topic !== WEATHER_TOPIC || !message || !message.embedId || isNaN(message.humidity) || isNaN(message.temperature)) return;
+        const message: FloodType = JSON.parse(payload.toString());
+        if(topic !== FLOOD_ALERT_TOPIC || !message || !message.embedId || isNaN(message.altitude) ) return;
         const device = await this.deviceService.getDevice({
           where: {
             embedId: message.embedId

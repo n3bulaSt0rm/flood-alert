@@ -1,4 +1,4 @@
-export type WeatherType = {
+export type FloodType = {
   time: string;
 
   altitude: number;

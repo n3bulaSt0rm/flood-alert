@@ -13,18 +13,17 @@ export class HistoriesService {
     private readonly repository: Repository<StateHistory>,
   ) {}
 
-
   public async getDashboard(query: DashboardFilter): Promise<any> {
     const data = await this.repository
       .createQueryBuilder()
-      .select('AVG(altitude)', 'avgAltitude') // Thay đổi từ temperature, humidity sang altitude
+      .select('AVG(altitude)', 'avgAltitude')
       .where('DATE(recorded_at) = :today', { today: DateUtils.getTodayWithTimezone() })
       .andWhere('device_id = :deviceId', { deviceId: query.deviceId })
       .getRawOne();
 
     return {
       date: DateUtils.getTodayWithTimezone(),
-      altitude: data.avgAltitude,
+      altitude: data?.avgAltitude || 0, // Giải quyết trường hợp không có dữ liệu
     };
   }
 
@@ -39,7 +38,7 @@ export class HistoriesService {
     return this.processData(data, `${request.startDate} 00:00:00`, `${request.endDate} 23:59:59`);
   }
 
-  private processData(data: any[], startTime: string, endTime: string) {
+  private processData(data: StateHistory[], startTime: string, endTime: string) {
     const result: any[] = [];
     if (data.length === 0) return result;
 

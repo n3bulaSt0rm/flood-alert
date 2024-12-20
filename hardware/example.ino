@@ -1,10 +1,10 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-const char* ssid = "";
-const char* password = "";
-const char* mqtt_server = "";
-const char* topic = "";
+const char* ssid = "lagvl";
+const char* password = "dangkimadung";
+const char* mqtt_server = "broker.hivemq.com";
+const char* topic = "flood";
 const int mqtt_port = 1883;
 
 const int trig = 5;
@@ -64,10 +64,12 @@ int measureDistance() {
 }
 
 void sendMQTT(int distance) {
+  // Tạo chuỗi JSON để gửi dữ liệu
   String message = "{\"distance\": " + String(distance) + "}";
   char buffer[message.length() + 1];
   message.toCharArray(buffer, message.length() + 1);
 
+  // Gửi dữ liệu đến topic MQTT
   Serial.println("Đang gửi dữ liệu đến MQTT...");
   if (client.publish(topic, buffer)) {
     Serial.println("Gửi dữ liệu thành công!");
@@ -76,7 +78,9 @@ void sendMQTT(int distance) {
   }
 }
 
+// Hàm kết nối lại MQTT broker
 void reconnect() {
+  // Kết nối lại MQTT broker nếu bị mất kết nối
   while (!client.connected()) {
     Serial.println("Đang kết nối đến MQTT...");
     String client_id = "esp32-client-";
