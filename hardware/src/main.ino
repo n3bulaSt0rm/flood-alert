@@ -73,14 +73,24 @@ int measureDistance() {
 
 void sendMQTT(int distance) {
   struct tm timeinfo;
-  if (!getLocalTime(&timeinfo)) {
-    Serial.println("Failed to obtain time");
+  int retryCount = 0;
+  const int maxRetries = 5;
+
+  while (!getLocalTime(&timeinfo) && retryCount < maxRetries) {
+    Serial.println("Failed to obtain time, retrying...");
+    delay(2000); // Wait before retrying
+    retryCount++;
+  }
+
+  if (retryCount == maxRetries) {
+    Serial.println("Failed to obtain time after maximum retries");
     return;
   }
+
   char timeStr[30];
   strftime(timeStr, sizeof(timeStr), "%Y-%m-%dT%H:%M:%S%z", &timeinfo);
 
-  String message = "{\"deviceId\": \"" + String(deviceId) + "\", \"altitude\": " + String(distance) + ", \"time\": \"" + String(timeStr) + "\"}";
+  String message = "{\"deviceId\": \"" + String(deviceId) + "\", \"distance\": " + String(distance) + ", \"time\": \"" + String(timeStr) + "\"}";
   char buffer[message.length() + 1];
   message.toCharArray(buffer, message.length() + 1);
 
