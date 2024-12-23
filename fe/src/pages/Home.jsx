@@ -40,24 +40,31 @@ const Home = () => {
         </section>
 
         {/* Image Gallery */}
+        {/* Image Gallery */}
         <section className="my-12">
           <h2 className="text-3xl font-semibold text-center mb-8">Gallery</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
-            <img
-              src={Weather1}
-              alt="Weather Illustration 1"
-              className="rounded-lg shadow-lg hover:scale-105 transition-transform"
-            />
-            <img
-              src={Weather2}
-              alt="Weather Illustration 2"
-              className="rounded-lg shadow-lg hover:scale-105 transition-transform"
-            />
-            <img
-              src={Weather3}
-              alt="Weather Illustration 3"
-              className="rounded-lg shadow-lg hover:scale-105 transition-transform"
-            />
+            <div className="relative aspect-w-4 aspect-h-3 rounded-lg shadow-lg overflow-hidden">
+              <img
+                src={Weather1}
+                alt="Weather Illustration 1"
+                className="w-full h-full object-cover hover:scale-105 transition-transform"
+              />
+            </div>
+            <div className="relative aspect-w-4 aspect-h-3 rounded-lg shadow-lg overflow-hidden">
+              <img
+                src={Weather2}
+                alt="Weather Illustration 2"
+                className="w-full h-full object-cover hover:scale-105 transition-transform"
+              />
+            </div>
+            <div className="relative aspect-w-4 aspect-h-3 rounded-lg shadow-lg overflow-hidden">
+              <img
+                src={Weather3}
+                alt="Weather Illustration 3"
+                className="w-full h-full object-cover hover:scale-105 transition-transform"
+              />
+            </div>
           </div>
         </section>
 

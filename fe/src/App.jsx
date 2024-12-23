@@ -7,8 +7,6 @@ import Home from "./pages/Home";
 import DeviceList from "./pages/devices/DeviceList";
 import AddDevice from "./pages/devices/AddDevice";
 import Analystic1 from "./pages/Analystic1/Analystic1"; 
-
-import AltitudeChart from "./pages/Altitude/AltitudeChart";
 // import Warring form "./pages/warring/warring";
 function App() {
   const location = useLocation();
@@ -58,7 +56,7 @@ function App() {
         <Route path="/add-device" element={<AddDevice />} />
 
         <Route path="/analystic" element={<Analystic1 />} />
-        <Route path="/altitude" element={<AltitudeChart />} />
+      
       </Routes>
     </div>
   );

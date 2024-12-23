@@ -7,11 +7,6 @@ export const NavbarLinks = [
     title: "Devices",
     path: "/devices",
   },
-
-  {
-    title: "altitude",
-    path: "/altitude",
-  },
   {
     title: "Analystic",
     path: "/analystic",
