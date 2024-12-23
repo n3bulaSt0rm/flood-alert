@@ -4,12 +4,12 @@ import { HiArrowNarrowUp } from "react-icons/hi";
 import { Routes, useLocation, Route } from "react-router-dom";
 import Navbar from "./components/common/Navbar";
 import Home from "./pages/Home";
-import DevicesHome from "./pages/devices/Devices";
+import DeviceList from "./pages/devices/DeviceList";
 import AddDevice from "./pages/devices/AddDevice";
-import EditDevice from "./pages/devices/EditDevice";
 import Dashboard from "./pages/dashboard/Dashboard";
-import Analytic from "./pages/analytics/Analytic";
 
+import AltitudeChart from "./pages/Altitude/AltitudeChart";
+// import Warring form "./pages/warring/warring";
 function App() {
   const location = useLocation();
 
@@ -43,23 +43,25 @@ function App() {
       <Navbar />
 
       {/* go upward arrow */}
-      <button onClick={() => window.scrollTo(0, 0)}
-        className={`bg-yellow-25 hover:bg-yellow-50 hover:scale-110 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 duration-500 ease-in-out ${showArrow ? 'bottom-6' : '-bottom-24'} `} >
+      <button
+        onClick={() => window.scrollTo(0, 0)}
+        className={`bg-yellow-25 hover:bg-yellow-50 hover:scale-110 p-3 text-lg text-black rounded-2xl fixed right-3 z-10 duration-500 ease-in-out ${
+          showArrow ? "bottom-6" : "-bottom-24"
+        } `}
+      >
         <HiArrowNarrowUp />
       </button>
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/devices" element={<DevicesHome />} />
+        <Route path="/devices" element={<DeviceList />} />
         <Route path="/add-device" element={<AddDevice />} />
-        <Route path="/edit-device/:id" element={<EditDevice />} />
-
-        <Route path="/dashboard" element={<Dashboard />} /> 
-
-        <Route path="/analytic" element={<Analytic />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      
+        <Route path="/altitude" element={<AltitudeChart />} />
       </Routes>
     </div>
-  )
+  );
 }
 
 export default App;

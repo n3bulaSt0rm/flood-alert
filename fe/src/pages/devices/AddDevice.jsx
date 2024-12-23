@@ -1,88 +1,81 @@
-import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { createDevice } from "../../services/operations/deviceApi";
+import axios from "axios";
 
-const AddDevice = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [name, setName] = useState("");
-  const [location, setLocation] = useState("");
-  const [embedId, setEmbedId] = useState("");
+const AddDevice = ({ fetchDevices, setShowAddDevice }) => {
+  const [newDevice, setNewDevice] = useState({
+    name: "",
+    embedId: "",
+    location: "",
+  });
 
-  const onSubmit = (e) => {
-    e.preventDefault()
-    dispatch(createDevice({
-      deviceName: name,
-      embedId: embedId,
-      location: {
-        name: location
-      }
-    }, navigate))
+  const handleAddDevice = async () => {
+    if (!newDevice.name || !newDevice.embedId || !newDevice.location) {
+      alert("Please fill out all fields!");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:3000/devices", {
+        name: newDevice.name,
+        embedId: newDevice.embedId,
+        location: { name: newDevice.location },
+      });
+      alert("Device added successfully!");
+      fetchDevices(); // Refresh danh sách thiết bị
+      setShowAddDevice(false); // Đóng form
+      setNewDevice({ name: "", embedId: "", location: "" }); // Reset form
+    } catch (error) {
+      console.error("Error adding device:", error);
+      alert("Failed to add device. Please try again.");
+    }
   };
 
   return (
-    <form
-      className="w-full max-w-sm container mt-20 mx-auto"
-      onSubmit={onSubmit}
-    >
-      <div className="w-full mb-5">
-        <label
-          className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-          htmlFor="deviceName"
-        >
-          Name of device
+    <div className="bg-gray-100 p-4 rounded mb-6 shadow-md">
+      <h2 className="text-xl font-bold mb-4">Add New Device</h2>
+      <div className="mb-4">
+        <label className="block text-gray-700 font-bold mb-2">
+          Name of Device
         </label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:text-gray-600"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          className="border rounded w-full p-2"
           type="text"
+          value={newDevice.name}
+          onChange={(e) => setNewDevice({ ...newDevice, name: e.target.value })}
           placeholder="Enter device name"
-          required={true}
         />
       </div>
-      <div className="w-full mb-5">
-        <label
-          className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-          htmlFor="embedId"
-        >
-          ID of device
-        </label>
+      <div className="mb-4">
+        <label className="block text-gray-700 font-bold mb-2">Embed ID</label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:text-gray-600 focus:shadow-outline"
-          value={embedId}
-          onChange={(e) => setEmbedId(e.target.value)}
+          className="border rounded w-full p-2"
           type="text"
-          placeholder="Enter embed identify"
-          required={true}
+          value={newDevice.embedId}
+          onChange={(e) =>
+            setNewDevice({ ...newDevice, embedId: e.target.value })
+          }
+          placeholder="Enter embed ID"
         />
       </div>
-      <div className="w-full mb-5">
-        <label
-          className="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-          htmlFor="location"
-        >
-          Location
-        </label>
+      <div className="mb-4">
+        <label className="block text-gray-700 font-bold mb-2">Location</label>
         <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:text-gray-600"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
+          className="border rounded w-full p-2"
           type="text"
+          value={newDevice.location}
+          onChange={(e) =>
+            setNewDevice({ ...newDevice, location: e.target.value })
+          }
           placeholder="Enter location"
-          required={true}
         />
       </div>
-      <div className="flex items-center justify-between">
-        <button className="mt-5 bg-caribbeangreen-200 w-full hover:bg-green-500 text-black font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          Add Device
-        </button>
-      </div>
-      <div className="text-center mt-4 text-pure-greys-200">
-        <Link to="/devices">Cancel</Link>
-      </div>
-    </form>
+      <button
+        onClick={handleAddDevice}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 shadow-md"
+      >
+        Add Device
+      </button>
+    </div>
   );
 };
 

@@ -14,5 +14,9 @@ export const NavbarLinks = [
   {
     title: "Analytic",
     path: "/analytic",
+  },
+  {
+    title: "Altitude",
+    path: "/altitude",
   }
 ];
