@@ -35,7 +35,7 @@ void setup() {
 
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
   Serial.println("Configuring time...");
-  delay(2000); // Wait for time to be set
+  delay(1000); // Wait for time to be set
 
   client.setServer(mqtt_server, mqtt_port);
 }
@@ -49,7 +49,7 @@ void loop() {
   int distance = measureDistance();
   sendMQTT(distance);
 
-  delay(2000);
+  delay(1000);
 }
 
 int measureDistance() {
@@ -72,13 +72,13 @@ int measureDistance() {
 }
 
 void sendMQTT(int distance) {
-  struct tm timeinfo;
+  time_t now;
   int retryCount = 0;
   const int maxRetries = 5;
 
-  while (!getLocalTime(&timeinfo) && retryCount < maxRetries) {
+  while ((now = time(nullptr)) == -1 && retryCount < maxRetries) {
     Serial.println("Failed to obtain time, retrying...");
-    delay(2000); // Wait before retrying
+    delay(1000); // Wait before retrying
     retryCount++;
   }
 
@@ -87,10 +87,7 @@ void sendMQTT(int distance) {
     return;
   }
 
-  char timeStr[30];
-  strftime(timeStr, sizeof(timeStr), "%Y-%m-%dT%H:%M:%S%z", &timeinfo);
-
-  String message = "{\"deviceId\": \"" + String(deviceId) + "\", \"distance\": " + String(distance) + ", \"time\": \"" + String(timeStr) + "\"}";
+  String message = "{\"DeviceID\": \"" + String(deviceId) + "\", \"Altitude\": " + String(distance) + ", \"RecordAt\": " + String(now) + "}";
   char buffer[message.length() + 1];
   message.toCharArray(buffer, message.length() + 1);
 
