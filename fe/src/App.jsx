@@ -6,7 +6,7 @@ import Navbar from "./components/common/Navbar";
 import Home from "./pages/Home";
 import DeviceList from "./pages/devices/DeviceList";
 import AddDevice from "./pages/devices/AddDevice";
-
+import Analystic1 from "./pages/Analystic1/Analystic1"; 
 
 import AltitudeChart from "./pages/Altitude/AltitudeChart";
 // import Warring form "./pages/warring/warring";
@@ -56,8 +56,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/devices" element={<DeviceList />} />
         <Route path="/add-device" element={<AddDevice />} />
-    
-      
+
+        <Route path="/analystic" element={<Analystic1 />} />
         <Route path="/altitude" element={<AltitudeChart />} />
       </Routes>
     </div>
