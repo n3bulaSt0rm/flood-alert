@@ -7,7 +7,7 @@ import Weather3 from "../assets/weather/weather3.jpg";
 import Weather4 from "../assets/weather/weather4.jpg";
 
 const Home = () => {
-  // Quản lý bước hiển thị: "email" hoặc "verify"
+  // Quản lý bước hiển thị: "email", "verify" hoặc "success"
   const [currentStep, setCurrentStep] = useState("email");
   // Quản lý giá trị email được nhập
   const [email, setEmail] = useState("");
@@ -15,53 +15,67 @@ const Home = () => {
   const [verifyCode, setVerifyCode] = useState("");
   // Quản lý việc hiển thị form
   const [showForm, setShowForm] = useState(false);
+  // Lưu thông tin lỗi của bước verify (nếu có)
+  const [verifyError, setVerifyError] = useState("");
+  // Lưu thông báo gửi lại OTP
+  const [resendMessage, setResendMessage] = useState("");
 
-  // Hàm để mở khối form
+  // Mở form
   const handleShowForm = () => {
     setShowForm(true);
-    setCurrentStep("email"); // Mặc định là hiển thị bước nhập email
+    setCurrentStep("email");
+    setEmail("");
+    setVerifyCode("");
+    setVerifyError("");
+    setResendMessage("");
   };
 
   // Đóng form
   const handleCloseForm = () => {
     setShowForm(false);
-    setCurrentStep("email"); // reset về bước email
-    setEmail("");
-    setVerifyCode("");
-  };
-
-  // Xử lý khi bấm nút xác nhận ở bước email
-  const handleEmailSubmit = (e) => {
-    e.preventDefault();
-    console.log("Email:", email);
-
-    // Ở đây bạn có thể gọi API để gửi mã xác thực về email
-
-    // Chuyển sang bước "verify" để nhập mã xác thực
-    setCurrentStep("verify");
-  };
-
-  // Xử lý khi bấm nút xác nhận ở bước verify
-  const handleVerifySubmit = (e) => {
-    e.preventDefault();
-    console.log("Verify Code:", verifyCode);
-    // Logic xác thực mã (gọi API, v.v.)
-    alert(`Mã xác thực bạn vừa nhập: ${verifyCode}`);
-
-    // Sau khi xác thực thành công, tuỳ ý ẩn form hoặc chuyển trang
-    setShowForm(false);
     setCurrentStep("email");
     setEmail("");
     setVerifyCode("");
+    setVerifyError("");
+    setResendMessage("");
   };
 
-  // Giao diện form nhập email
+  // Xử lý khi bấm nút Xác nhận ở bước email
+  const handleEmailSubmit = (e) => {
+    e.preventDefault();
+    // Gửi OTP tới email tại đây (nếu cần)
+    setCurrentStep("verify");
+    setVerifyError("");
+    setResendMessage("");
+  };
+
+  // **Nút Gửi lại OTP**: logic gọi API để gửi lại mã OTP hoặc reset verifyCode
+  const handleResendOtp = () => {
+    // Ở đây bạn có thể gọi API, đặt lại verifyCode hoặc hiển thị thông báo “Đã gửi lại OTP”
+    setVerifyCode("");
+    setVerifyError("");
+    setResendMessage("OTP đã được gửi, vui lòng kiểm tra email");
+  };
+
+  // Xử lý khi bấm nút Xác nhận ở bước verify
+  const handleVerifySubmit = (e) => {
+    e.preventDefault();
+    // Giả sử mã đúng là "123456"
+    if (verifyCode === "123456") {
+      setCurrentStep("success");
+      setVerifyError("");
+      setResendMessage("");
+    } else {
+      setVerifyError("Mã xác thực không đúng. Vui lòng thử lại!");
+    }
+  };
+
+  // Form nhập email
   const renderEmailForm = () => (
     <div className="relative bg-white text-black p-6 rounded shadow-lg w-80">
-      {/* Nút đóng form - dấu X */}
       <button
         className="absolute top-2 right-2 text-gray-500 text-xl font-bold 
-                          hover:text-gray-700 focus:outline-none"
+                   hover:text-gray-700 focus:outline-none"
         onClick={handleCloseForm}
       >
         &times;
@@ -91,13 +105,12 @@ const Home = () => {
     </div>
   );
 
-  // Giao diện form nhập mã xác thực
+  // Form nhập mã xác thực
   const renderVerifyForm = () => (
     <div className="relative bg-white text-black p-6 rounded shadow-lg w-80">
-      {/* Nút đóng form - dấu X */}
       <button
-        className="absolute top-2 right-2 text-gray-500 text-xl font-bold 
-                          hover:text-gray-700 focus:outline-none"
+        className="absolute top-2 right-2 text-gray-500 text-xl font-bold
+                   hover:text-gray-700 focus:outline-none"
         onClick={handleCloseForm}
       >
         &times;
@@ -117,13 +130,60 @@ const Home = () => {
           onChange={(e) => setVerifyCode(e.target.value)}
           required
         />
-        <button
-          type="submit"
-          className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
-        >
-          Xác nhận
-        </button>
+        {/* Hiển thị lỗi nếu mã sai */}
+        {verifyError && (
+          <p className="text-red-500 text-sm mt-1">{verifyError}</p>
+        )}
+        {/* Hiển thị thông báo Gửi lại OTP (nếu có) */}
+        {resendMessage && (
+          <p className="text-green-600 text-sm mt-1">{resendMessage}</p>
+        )}
+
+        {/* 
+          Khối nút: Xác nhận & Gửi lại OTP (cùng màu)
+          Dùng flex & gap-4 để đặt nút cạnh nhau.
+        */}
+        <div className="mt-4 flex gap-4">
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
+          >
+            Xác nhận
+          </button>
+          <button
+            type="button"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
+            onClick={handleResendOtp}
+          >
+            Gửi lại OTP
+          </button>
+        </div>
       </form>
+    </div>
+  );
+
+  // Form báo thành công
+  const renderSuccessMessage = () => (
+    <div className="relative bg-white text-black p-6 rounded shadow-lg w-80">
+      <button
+        className="absolute top-2 right-2 text-gray-500 text-xl font-bold
+                   hover:text-gray-700 focus:outline-none"
+        onClick={handleCloseForm}
+      >
+        &times;
+      </button>
+      <h3 className="text-xl font-bold text-green-600 mb-2">
+        Xác thực thông tin chính xác!
+      </h3>
+      <p className="text-base mb-6">
+        Đừng quên kiểm tra email để nhận thông báo sớm nhất.
+      </p>
+      <button
+        onClick={handleCloseForm}
+        className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded"
+      >
+        Đóng
+      </button>
     </div>
   );
 
@@ -161,7 +221,6 @@ const Home = () => {
 
         {/* Nút “Bạn muốn nhận thông tin?” và Form */}
         <section className="flex justify-center mb-12">
-          {/* Nếu chưa mở form thì hiện nút, ngược lại hiển thị form */}
           {!showForm ? (
             <button
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
@@ -171,8 +230,10 @@ const Home = () => {
             </button>
           ) : currentStep === "email" ? (
             renderEmailForm()
-          ) : (
+          ) : currentStep === "verify" ? (
             renderVerifyForm()
+          ) : (
+            renderSuccessMessage()
           )}
         </section>
 
