@@ -9,8 +9,13 @@ export class UsersController {
   }
 
   @Post()
-  public async createUser(@Body() request: CreateUserDto): Promise<string> {
-    return await this.usersService.createUser(request);
+  public async createUser(@Body() request: CreateUserDto): Promise<{message: string}> {
+    try {
+      const resp = await this.usersService.createUser(request);
+      return { message: resp };
+    } catch (error) {
+      return { message: error.message };
+    }
   }
 
   @Get('/:id')
