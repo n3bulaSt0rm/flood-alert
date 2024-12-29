@@ -25,19 +25,19 @@ function AdminLogin() {
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm">
         <h2 className="text-2xl font-semibold mb-6 text-center">Admin Login</h2>
         <form onSubmit={handleSubmit} className="flex flex-col">
-          <label className="mb-1 text-gray-700 font-medium">Tài khoản</label>
+          <label className="mb-1 text-gray-700 font-medium">Account</label>
           <input
             type="text"
-            placeholder="Nhập tài khoản..."
+            placeholder="Enter Account..."
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="border rounded px-3 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
 
-          <label className="mb-1 text-gray-700 font-medium">Mật khẩu</label>
+          <label className="mb-1 text-gray-700 font-medium">Password</label>
           <input
             type="password"
-            placeholder="Nhập mật khẩu..."
+            placeholder="Enter Password.."
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="border rounded px-3 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-400"

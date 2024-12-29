@@ -4,7 +4,7 @@ export const configuration = () => ({
     host: "localhost",
     port: "5432",
     user: "postgres",
-    password: "test123",
+    password: "123456",
     db: "postgres",
     ssl_ca_file: process.env.POSTGRES_CA_FILE ?? '',
   },

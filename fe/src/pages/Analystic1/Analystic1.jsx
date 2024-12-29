@@ -49,7 +49,7 @@ const App = () => {
       .then((data) => {
         setDevices(data);
         if (data.length > 0) {
-          setSelectedDevice(data[0].deviceName); // Chọn thiết bị đầu tiên theo mặc định
+          setSelectedDevice(data[0].deviceName); 
         }
       })
       .catch((error) => console.error("Error fetching devices:", error));
