@@ -45,6 +45,7 @@
     "@nestjs/schedule": "^4.1.1",
     "@nestjs/swagger": "^7.4.2",
     "@nestjs/typeorm": "^10.0.2",
+    "build": "^0.1.4",
     "cache-manager": "^5.7.6",
     "cache-manager-ioredis": "^2.1.0",
     "cache-manager-memcached": "^0.0.3",

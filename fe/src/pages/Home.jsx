@@ -40,13 +40,39 @@ const Home = () => {
     setResendMessage("");
   };
 
+  
   // Xử lý khi bấm nút Xác nhận ở bước email
-  const handleEmailSubmit = (e) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
-    // Gửi OTP tới email tại đây (nếu cần)
-    setCurrentStep("verify");
-    setVerifyError("");
-    setResendMessage("");
+
+    try {
+      const response = await fetch("http://localhost:8081/user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        // Giả sử API trả về trạng thái thành công
+        const data = await response.json();
+        console.log("API response:", data);
+        setCurrentStep("verify");
+        setVerifyError("");
+        setResendMessage("");
+      } else {
+        // Xử lý lỗi nếu API trả về trạng thái không thành công
+        const errorData = await response.json();
+        console.error("API error:", errorData);
+        alert("Đã xảy ra lỗi khi gửi email. Vui lòng thử lại!");
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert(
+        "Không thể kết nối với máy chủ. Vui lòng kiểm tra kết nối của bạn!"
+      );
+    }
   };
 
   // **Nút Gửi lại OTP**: logic gọi API để gửi lại mã OTP hoặc reset verifyCode
