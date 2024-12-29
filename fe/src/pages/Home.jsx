@@ -78,7 +78,7 @@ const Home = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ otp: verifyCode }),
+        body: JSON.stringify({ email, otp: verifyCode }),
       });
 
       if (response.ok) {
