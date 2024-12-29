@@ -45,7 +45,7 @@ export class DevicesService {
     return await this.deviceRepository.save(deviceUpdated);
   }
 
-  public async deleteDevice(id: number): Promise<DeleteResult> {
+  public async deleteDevice(id: string): Promise<DeleteResult> {
     Logger.debug('Delete Device', this.TAG);
     const device = await this.getDevice({
       where: {

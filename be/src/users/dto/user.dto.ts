@@ -1,22 +1,19 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateDeviceDto {
+export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
-  deviceName: string;
+  id: string;
 
   @IsNotEmpty()
   @IsString()
-  location: string;
+  email: string;
 }
 
-export class UpdateDeviceDto {
+export class UpdateUserDto {
   @IsNotEmpty()
   id: string;
 
   @IsString()
-  deviceName?: string;
-
-  @IsString()
-  location?: string;
+  email?: string;
 }

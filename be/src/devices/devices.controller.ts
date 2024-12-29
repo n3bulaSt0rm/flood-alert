@@ -7,7 +7,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('DeviceService')
 @ApiBearerAuth()
-@Controller('devices')
+@Controller('device')
 export class DevicesController {
   constructor(private readonly devicesService: DevicesService) {}
 
@@ -22,14 +22,11 @@ export class DevicesController {
   }
 
   @Get('/:id')
-  public async getDevice(@Param('id') id: number): Promise<DeviceEntity | any> {
+  public async getDevice(@Param('id') id: string): Promise<DeviceEntity | any> {
     return await this.devicesService.getDevice({
       where: {
         id: id
       },
-      relations: {
-        stateHistories: true
-      }
     }) ?? {};
   }
 
@@ -39,7 +36,7 @@ export class DevicesController {
   }
 
   @Delete('/:id')
-  public async deleteDevice(@Param('id') id: number): Promise<DeleteResult> {
+  public async deleteDevice(@Param('id') id: string): Promise<DeleteResult> {
     return await this.devicesService.deleteDevice(id);
   }
 }
