@@ -226,7 +226,8 @@ const Home = () => {
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
               onClick={handleShowForm}
             >
-              Bạn muốn nhận thông tin?
+              Keep yourself and those you care about protected by staying
+              informed.
             </button>
           ) : currentStep === "email" ? (
             renderEmailForm()

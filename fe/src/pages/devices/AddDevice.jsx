@@ -3,22 +3,22 @@ import axios from "axios";
 
 const AddDevice = ({ fetchDevices, setShowAddDevice }) => {
   const [newDevice, setNewDevice] = useState({
-    name: "",
-    embedId: "",
+    id: "",
+    deviceName: "",
     location: "",
   });
 
   const handleAddDevice = async () => {
-    if (!newDevice.name || !newDevice.embedId || !newDevice.location) {
+    if (!newDevice.id || !newDevice.deviceName || !newDevice.location) {
       alert("Please fill out all fields!");
       return;
     }
 
     try {
-      await axios.post("http://localhost:3000/devices", {
-        name: newDevice.name,
-        embedId: newDevice.embedId,
-        location: { name: newDevice.location },
+      await axios.post("http://localhost:8081/device", {
+        id: newDevice.id,
+        deviceName: newDevice.deviceName,
+        location: newDevice.location,
       });
       alert("Device added successfully!");
       fetchDevices(); // Refresh danh sách thiết bị
@@ -35,26 +35,26 @@ const AddDevice = ({ fetchDevices, setShowAddDevice }) => {
       <h2 className="text-xl font-bold mb-4">Add New Device</h2>
       <div className="mb-4">
         <label className="block text-gray-700 font-bold mb-2">
-          Name of Device
+          Device Id
         </label>
         <input
           className="border rounded w-full p-2"
           type="text"
-          value={newDevice.name}
-          onChange={(e) => setNewDevice({ ...newDevice, name: e.target.value })}
-          placeholder="Enter device name"
+          value={newDevice.id}
+          onChange={(e) => setNewDevice({ ...newDevice, id: e.target.value })}
+          placeholder="Enter Device Id"
         />
       </div>
       <div className="mb-4">
-        <label className="block text-gray-700 font-bold mb-2">Embed ID</label>
+        <label className="block text-gray-700 font-bold mb-2">Name Of Device</label>
         <input
           className="border rounded w-full p-2"
           type="text"
-          value={newDevice.embedId}
+          value={newDevice.deviceName}
           onChange={(e) =>
-            setNewDevice({ ...newDevice, embedId: e.target.value })
+            setNewDevice({ ...newDevice, deviceName: e.target.value })
           }
-          placeholder="Enter embed ID"
+          placeholder="Enter name of device"
         />
       </div>
       <div className="mb-4">
