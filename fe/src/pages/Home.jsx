@@ -66,7 +66,7 @@ const Home = () => {
 
   const handleResendOtp = async () => {
     try {
-      const response = await fetch("http://localhost:8081/user/resend-otp", {
+      const response = await fetch("http://localhost:8081/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,17 +77,19 @@ const Home = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Resend OTP response:", data);
-        setResendMessage("OTP đã được gửi, vui lòng kiểm tra email");
+        setResendMessage("OTP has been sent, please check your email");
         setVerifyError("");
       } else {
         const errorData = await response.json();
         console.error("Resend OTP error:", errorData);
-        setResendMessage("Đã xảy ra lỗi khi gửi lại OTP. Vui lòng thử lại!");
+        setResendMessage(
+          "An error occurred while resending the OTP. Please try again!"
+        );
       }
     } catch (error) {
       console.error("Network error:", error);
       setResendMessage(
-        "Không thể kết nối với máy chủ. Vui lòng kiểm tra kết nối của bạn!"
+        "Unable to connect to the server. Please check your connection!"
       );
     }
   };
@@ -111,17 +113,19 @@ const Home = () => {
           setVerifyError("");
           setResendMessage("");
         } else {
-          setVerifyError("Mã xác thực không đúng. Vui lòng thử lại!");
+          setVerifyError("Authentication code is incorrect. Please try again!");
         }
       } else {
         const errorData = await response.json();
         console.error("API error:", errorData);
-        setVerifyError("Đã xảy ra lỗi khi xác thực. Vui lòng thử lại!");
+        setVerifyError(
+          "An error occurred while authenticating. Please try again!"
+        );
       }
     } catch (error) {
       console.error("Network error:", error);
       setVerifyError(
-        "Không thể kết nối với máy chủ. Vui lòng kiểm tra kết nối của bạn!"
+        "Unable to connect to the server. Please check your connection!"
       );
     }
   };
@@ -135,7 +139,9 @@ const Home = () => {
       >
         &times;
       </button>
-      <h3 className="text-lg font-semibold mb-4">Đăng ký nhận thông tin</h3>
+      <h3 className="text-lg font-semibold mb-4">
+        Sign up to receive information
+      </h3>
       <form onSubmit={handleEmailSubmit}>
         <label htmlFor="email" className="block mb-2 font-medium">
           Nhập email:
@@ -154,7 +160,7 @@ const Home = () => {
           type="submit"
           className="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
         >
-          Xác nhận
+          Confirm
         </button>
       </form>
     </div>
@@ -169,16 +175,18 @@ const Home = () => {
       >
         &times;
       </button>
-      <h3 className="text-lg font-semibold mb-4">Nhập mã xác thực</h3>
+      <h3 className="text-lg font-semibold mb-4">
+        Enter the authentication code
+      </h3>
       <form onSubmit={handleVerifySubmit}>
         <label htmlFor="verify" className="block mb-2 font-medium">
-          Mã xác thực:
+          Authentication code:
         </label>
         <input
           id="verify"
           name="verify"
           type="text"
-          placeholder="Nhập mã gồm 6 chữ số..."
+          placeholder="Enter the 6-digit code..."
           className="border border-gray-300 rounded w-full py-2 px-3 text-gray-700"
           value={verifyCode}
           onChange={(e) => setVerifyCode(e.target.value)}
@@ -195,14 +203,14 @@ const Home = () => {
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
           >
-            Xác nhận
+            Confirm
           </button>
           <button
             type="button"
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded"
             onClick={handleResendOtp}
           >
-            Gửi lại OTP
+            Resend OTP
           </button>
         </div>
       </form>
@@ -219,16 +227,17 @@ const Home = () => {
         &times;
       </button>
       <h3 className="text-xl font-bold text-green-600 mb-2">
-        Xác thực thông tin chính xác!
+        Verify accurate information!
       </h3>
       <p className="text-base mb-6">
-        Đừng quên kiểm tra email để nhận thông báo sớm nhất.
+        Don't forget to turn on notifications to receive the earliest flood
+        warnings.
       </p>
       <button
         onClick={handleCloseForm}
         className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded"
       >
-        Đóng
+        Close
       </button>
     </div>
   );
