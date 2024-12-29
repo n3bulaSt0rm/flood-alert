@@ -7,20 +7,13 @@ import Weather3 from "../assets/weather/weather3.jpg";
 import Weather4 from "../assets/weather/weather4.jpg";
 
 const Home = () => {
-  // Quản lý bước hiển thị: "email", "verify" hoặc "success"
   const [currentStep, setCurrentStep] = useState("email");
-  // Quản lý giá trị email được nhập
   const [email, setEmail] = useState("");
-  // Quản lý mã xác thực được nhập
   const [verifyCode, setVerifyCode] = useState("");
-  // Quản lý việc hiển thị form
   const [showForm, setShowForm] = useState(false);
-  // Lưu thông tin lỗi của bước verify (nếu có)
   const [verifyError, setVerifyError] = useState("");
-  // Lưu thông báo gửi lại OTP
   const [resendMessage, setResendMessage] = useState("");
 
-  // Mở form
   const handleShowForm = () => {
     setShowForm(true);
     setCurrentStep("email");
@@ -30,7 +23,6 @@ const Home = () => {
     setResendMessage("");
   };
 
-  // Đóng form
   const handleCloseForm = () => {
     setShowForm(false);
     setCurrentStep("email");
@@ -40,8 +32,6 @@ const Home = () => {
     setResendMessage("");
   };
 
-  
-  // Xử lý khi bấm nút Xác nhận ở bước email
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
 
@@ -55,14 +45,12 @@ const Home = () => {
       });
 
       if (response.ok) {
-        // Giả sử API trả về trạng thái thành công
         const data = await response.json();
         console.log("API response:", data);
         setCurrentStep("verify");
         setVerifyError("");
         setResendMessage("");
       } else {
-        // Xử lý lỗi nếu API trả về trạng thái không thành công
         const errorData = await response.json();
         console.error("API error:", errorData);
         alert("Đã xảy ra lỗi khi gửi email. Vui lòng thử lại!");
@@ -75,28 +63,46 @@ const Home = () => {
     }
   };
 
-  // **Nút Gửi lại OTP**: logic gọi API để gửi lại mã OTP hoặc reset verifyCode
   const handleResendOtp = () => {
-    // Ở đây bạn có thể gọi API, đặt lại verifyCode hoặc hiển thị thông báo “Đã gửi lại OTP”
     setVerifyCode("");
     setVerifyError("");
     setResendMessage("OTP đã được gửi, vui lòng kiểm tra email");
   };
 
-  // Xử lý khi bấm nút Xác nhận ở bước verify
-  const handleVerifySubmit = (e) => {
+  const handleVerifySubmit = async (e) => {
     e.preventDefault();
-    // Giả sử mã đúng là "123456"
-    if (verifyCode === "123456") {
-      setCurrentStep("success");
-      setVerifyError("");
-      setResendMessage("");
-    } else {
-      setVerifyError("Mã xác thực không đúng. Vui lòng thử lại!");
+
+    try {
+      const response = await fetch("http://localhost:8081/user/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ otp: verifyCode }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.message === "OTP verification successful.") {
+          setCurrentStep("success");
+          setVerifyError("");
+          setResendMessage("");
+        } else {
+          setVerifyError("Mã xác thực không đúng. Vui lòng thử lại!");
+        }
+      } else {
+        const errorData = await response.json();
+        console.error("API error:", errorData);
+        setVerifyError("Đã xảy ra lỗi khi xác thực. Vui lòng thử lại!");
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      setVerifyError(
+        "Không thể kết nối với máy chủ. Vui lòng kiểm tra kết nối của bạn!"
+      );
     }
   };
 
-  // Form nhập email
   const renderEmailForm = () => (
     <div className="relative bg-white text-black p-6 rounded shadow-lg w-80">
       <button
@@ -131,7 +137,6 @@ const Home = () => {
     </div>
   );
 
-  // Form nhập mã xác thực
   const renderVerifyForm = () => (
     <div className="relative bg-white text-black p-6 rounded shadow-lg w-80">
       <button
@@ -156,19 +161,12 @@ const Home = () => {
           onChange={(e) => setVerifyCode(e.target.value)}
           required
         />
-        {/* Hiển thị lỗi nếu mã sai */}
         {verifyError && (
           <p className="text-red-500 text-sm mt-1">{verifyError}</p>
         )}
-        {/* Hiển thị thông báo Gửi lại OTP (nếu có) */}
         {resendMessage && (
           <p className="text-green-600 text-sm mt-1">{resendMessage}</p>
         )}
-
-        {/* 
-          Khối nút: Xác nhận & Gửi lại OTP (cùng màu)
-          Dùng flex & gap-4 để đặt nút cạnh nhau.
-        */}
         <div className="mt-4 flex gap-4">
           <button
             type="submit"
@@ -188,7 +186,6 @@ const Home = () => {
     </div>
   );
 
-  // Form báo thành công
   const renderSuccessMessage = () => (
     <div className="relative bg-white text-black p-6 rounded shadow-lg w-80">
       <button
@@ -219,7 +216,6 @@ const Home = () => {
         className="bg-cover bg-center min-h-screen text-white"
         style={{ backgroundImage: `url(${Weather4})` }}
       >
-        {/* Header */}
         <header className="text-center py-10">
           <h1 className="text-4xl font-bold">Welcome to flood warning App</h1>
           <p className="mt-4 text-lg">
@@ -227,7 +223,6 @@ const Home = () => {
           </p>
         </header>
 
-        {/* About Section */}
         <section className="max-w-4xl mx-auto text-center my-12 px-6">
           <h2 className="text-3xl font-semibold mb-6">What We Do</h2>
           <p className="text-lg leading-7">
@@ -245,7 +240,6 @@ const Home = () => {
           </ul>
         </section>
 
-        {/* Nút “Bạn muốn nhận thông tin?” và Form */}
         <section className="flex justify-center mb-12">
           {!showForm ? (
             <button
@@ -264,7 +258,6 @@ const Home = () => {
           )}
         </section>
 
-        {/* Image Gallery */}
         <section className="my-12">
           <h2 className="text-3xl font-semibold text-center mb-8">Gallery</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6">
@@ -292,7 +285,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Footer */}
         <footer className="bg-blue-600 py-6 text-center">
           <p className="text-lg">
             &copy; {new Date().getFullYear()} Flood warning App. All rights
