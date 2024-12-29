@@ -50,6 +50,7 @@ const Home = () => {
         setCurrentStep("verify");
         setVerifyError("");
         setResendMessage("");
+        alert("Vui lòng kiểm tra email để nhận OTP.");
       } else {
         const errorData = await response.json();
         console.error("API error:", errorData);
@@ -63,10 +64,32 @@ const Home = () => {
     }
   };
 
-  const handleResendOtp = () => {
-    setVerifyCode("");
-    setVerifyError("");
-    setResendMessage("OTP đã được gửi, vui lòng kiểm tra email");
+  const handleResendOtp = async () => {
+    try {
+      const response = await fetch("http://localhost:8081/user/resend-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Resend OTP response:", data);
+        setResendMessage("OTP đã được gửi, vui lòng kiểm tra email");
+        setVerifyError("");
+      } else {
+        const errorData = await response.json();
+        console.error("Resend OTP error:", errorData);
+        setResendMessage("Đã xảy ra lỗi khi gửi lại OTP. Vui lòng thử lại!");
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      setResendMessage(
+        "Không thể kết nối với máy chủ. Vui lòng kiểm tra kết nối của bạn!"
+      );
+    }
   };
 
   const handleVerifySubmit = async (e) => {
