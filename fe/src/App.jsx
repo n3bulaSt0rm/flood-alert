@@ -8,14 +8,14 @@ import DeviceList from "./pages/devices/DeviceList";
 import AddDevice from "./pages/devices/AddDevice";
 import Analystic1 from "./pages/Analystic1/Analystic1";
 
-// ===== THÊM 2 IMPORT DƯỚI =====
+
 import AdminLogin from "./pages/admin/AdminLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const location = useLocation();
 
-  // Mỗi khi pathname thay đổi => cuộn lên top
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
@@ -28,7 +28,7 @@ function App() {
     window.scrollTo(0, 0);
   }, []);
 
-  // Quản lý hiển thị nút scrollToTop
+  
   const [showArrow, setShowArrow] = useState(false);
   const handleArrow = () => {
     if (window.scrollY > 500) {
@@ -61,10 +61,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
 
-        {/* ====== ROUTE TRANG ADMIN LOGIN ====== */}
+        
         <Route path="/admin-login" element={<AdminLogin />} />
 
-        {/* ====== PROTECTED ROUTES ====== */}
+    
         <Route
           path="/devices"
           element={
@@ -82,7 +82,7 @@ function App() {
           }
         />
 
-        {/* Route khác */}
+      
         <Route path="/analystic" element={<Analystic1 />} />
       </Routes>
     </div>

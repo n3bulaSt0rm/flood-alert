@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import axios from "axios";
 import AddDevice from "./AddDevice";
+import { AuthContext } from "../../context/AuthContext";
 
 const DeviceList = () => {
   const [devices, setDevices] = useState([]);
   const [showAddDevice, setShowAddDevice] = useState(false);
-  const [editingDevice, setEditingDevice] = useState(null); // Lưu thông tin thiết bị đang chỉnh sửa
+  const [editingDevice, setEditingDevice] = useState(null);
 
-  // Fetch danh sách thiết bị từ API
+  const { logout } = useContext(AuthContext); // Lấy hàm logout từ AuthContext
+
   const fetchDevices = async () => {
     try {
       const response = await axios.get("http://localhost:8081/device");
@@ -18,13 +20,12 @@ const DeviceList = () => {
     }
   };
 
-  // Xóa thiết bị
   const handleDeleteDevice = async (id) => {
     if (window.confirm("Are you sure you want to delete this device?")) {
       try {
         await axios.delete(`http://localhost:8081/device/${id}`);
         alert("Device deleted successfully!");
-        fetchDevices(); // Refresh danh sách thiết bị
+        fetchDevices();
       } catch (error) {
         console.error("Error deleting device:", error);
         alert("Failed to delete device.");
@@ -32,21 +33,16 @@ const DeviceList = () => {
     }
   };
 
-  // Hiển thị form chỉnh sửa thiết bị
   const handleEditDevice = (device) => {
-    setEditingDevice(device); // Lưu thiết bị cần chỉnh sửa vào state
+    setEditingDevice(device);
   };
 
-  // Cập nhật thông tin thiết bị
   const handleUpdateDevice = async (updatedDevice) => {
     try {
-      await axios.patch(
-        `http://localhost:8081/device`,
-        updatedDevice
-      );
+      await axios.patch(`http://localhost:8081/device`, updatedDevice);
       alert("Device updated successfully!");
-      setEditingDevice(null); // Đóng form chỉnh sửa
-      fetchDevices(); // Refresh danh sách thiết bị
+      setEditingDevice(null);
+      fetchDevices();
     } catch (error) {
       console.error("Error updating device:", error);
       alert("Failed to update device.");
@@ -58,8 +54,7 @@ const DeviceList = () => {
   }, []);
 
   return (
-    <div className="container mx-auto mt-10">
-      {/* Header */}
+    <div className="container mx-auto mt-10 relative">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Device List</h1>
         <button
@@ -70,7 +65,6 @@ const DeviceList = () => {
         </button>
       </div>
 
-      {/* Form thêm thiết bị */}
       {showAddDevice && (
         <AddDevice
           fetchDevices={fetchDevices}
@@ -78,16 +72,9 @@ const DeviceList = () => {
         />
       )}
 
-      {/* Form chỉnh sửa thiết bị */}
       {editingDevice && (
         <div className="mb-6 p-4 border rounded bg-gray-50 relative">
           <h2 className="text-lg font-bold mb-4">Edit Device</h2>
-          {/* <button
-            onClick={() => setEditingDevice(null)}
-            className="absolute top-2 right-2 bg-gray-300 hover:bg-gray-400 text-black px-2 py-1 rounded-full"
-          >
-            X
-          </button> */}
           <label className="block mb-2">
             Name:
             <input
@@ -130,7 +117,6 @@ const DeviceList = () => {
         </div>
       )}
 
-      {/* Device Table */}
       <table className="table-auto w-full border">
         <thead>
           <tr>
@@ -176,6 +162,13 @@ const DeviceList = () => {
           )}
         </tbody>
       </table>
+
+      <button
+        onClick={logout}
+        className="fixed bottom-5 right-5 bg-blue-500 text-white px-4 py-2 rounded hover:bg-red-600 shadow-md z-50"
+      >
+        Logout
+      </button>
     </div>
   );
 };

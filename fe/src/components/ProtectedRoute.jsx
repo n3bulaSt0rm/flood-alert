@@ -6,11 +6,9 @@ function ProtectedRoute({ children }) {
   const { isAdmin } = useContext(AuthContext);
 
   if (!isAdmin) {
-    // Chưa đăng nhập → điều hướng sang /admin-login
     return <Navigate to="/admin-login" replace />;
   }
 
-  // Đã đăng nhập → render children (ví dụ DeviceList, AddDevice)
   return children;
 }
 
