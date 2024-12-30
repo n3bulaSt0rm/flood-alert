@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeviceEntity } from './entities/device.entity';
 import { DeleteResult, FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 import { CreateDeviceDto, UpdateDeviceDto } from './dto/device.dto';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class DevicesService {
@@ -11,11 +12,18 @@ export class DevicesService {
   constructor(
     @InjectRepository(DeviceEntity)
     private readonly deviceRepository: Repository<DeviceEntity>,
+    private readonly httpService: HttpService,
+
   ) {}
 
   public async createDevice(dto: CreateDeviceDto): Promise<DeviceEntity> {
     Logger.debug('Create Device', this.TAG);
-    return await this.deviceRepository.save(dto);
+    const newDevice = await this.deviceRepository.save(dto);
+
+    const apiUrl = 'http://localhost:8080/topic/add';
+    await this.httpService.post(apiUrl, { deviceId: newDevice.id }).toPromise();
+
+    return newDevice;
   }
 
   public async getDevice(options: FindOneOptions<DeviceEntity>): Promise<DeviceEntity | null> {
@@ -55,6 +63,10 @@ export class DevicesService {
     if (!device) {
       throw new NotFoundException(`Device ${id} not found!`);
     }
-    return await this.deviceRepository.delete(id);
+    const del = await this.deviceRepository.delete(id);
+    const apiUrl = 'http://localhost:8080/topic/remove';
+    await this.httpService.post(apiUrl, { deviceId: id }).toPromise();
+
+    return del;
   }
 }

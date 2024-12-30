@@ -2,6 +2,9 @@ import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateDeviceDto {
   @IsNotEmpty()
+  id: string;
+
+  @IsNotEmpty()
   @IsString()
   deviceName: string;
 
