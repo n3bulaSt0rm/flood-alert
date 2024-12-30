@@ -27,6 +27,7 @@ export class UsersService {
       throw new ConflictException('Email đã tồn tại!');
     }
 
+    await this.redisClient.del(dto.email);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     await this.redisClient.setex(dto.email, 90, otp);
     const message = `Mã OTP của bạn là: ${otp}`;

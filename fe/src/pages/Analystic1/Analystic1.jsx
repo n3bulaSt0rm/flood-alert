@@ -9,19 +9,23 @@ import {
   Title,
   Tooltip,
   Legend,
+  TimeScale,
 } from "chart.js";
+import "chartjs-adapter-luxon";
+import { DateTime } from "luxon";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+    TimeScale
 );
 
-const MAX_TIME_SECONDS = 300; // Hiển thị 5 phút dữ liệu (300 giây)
+const MAX_TIME_SECONDS = 120;
 
 const App = () => {
   const [chartData, setChartData] = useState({
@@ -31,206 +35,206 @@ const App = () => {
         label: "Water Altitude (m)",
         data: [],
         borderColor: "rgba(75, 192, 192, 1)",
+        backgroundColor: "rgba(75, 192, 192, 0.1)",
         borderWidth: 2,
-        tension: 0.2,
+        tension: 0.4,
         pointRadius: 0,
-        pointHoverRadius: 0,
+        pointHoverRadius: 5,
+        cubicInterpolationMode: "monotone",
       },
     ],
   });
 
   const [devices, setDevices] = useState([]);
   const [selectedDevice, setSelectedDevice] = useState(null);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    // Fetch danh sách thiết bị từ API
     fetch("http://localhost:8081/device")
-      .then((response) => response.json())
-      .then((data) => {
-        setDevices(data);
-        if (data.length > 0) {
-          setSelectedDevice(data[0].deviceName); 
-        }
-      })
-      .catch((error) => console.error("Error fetching devices:", error));
+        .then((response) => response.json())
+        .then((data) => {
+          setDevices(data);
+          if (data.length > 0) {
+            setSelectedDevice(data[0].id);
+          }
+        })
+        .catch((error) => console.error("Lỗi fetch thiết bị:", error));
   }, []);
+
+  useEffect(() => {
+    setChartData({
+      labels: [],
+      datasets: [
+        {
+          label: "Water Altitude (m)",
+          data: [],
+          borderColor: "rgba(75, 192, 192, 1)",
+          backgroundColor: "rgba(75, 192, 192, 0.1)",
+          borderWidth: 2,
+          tension: 0.4,
+        },
+      ],
+    });
+  }, [selectedDevice]);
 
   useEffect(() => {
     if (!selectedDevice) return;
 
-    const socket = new WebSocket("ws://localhost:8080/ws");
+    if (socket) {
+      socket.close();
+    }
 
-    socket.onopen = () => {
-      console.log("Connected to WebSocket server");
+    const newSocket = new WebSocket("ws://localhost:8080/ws");
+
+    newSocket.onopen = () => {
+      console.log("Kết nối WebSocket thành công");
+      newSocket.send(JSON.stringify({ deviceId: selectedDevice }));
     };
 
-    socket.onmessage = (event) => {
+    newSocket.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      const altitude = message.altitude; // Giá trị độ cao nước
-      const currentTime = new Date().toLocaleTimeString(); // Nhãn thời gian hiện tại
+      if (message.deviceId === selectedDevice) {
+        const altitude = message.altitude;
+        const recordTime = new Date(message.recordAt).toISOString();
 
-      setChartData((prevChartData) => {
-        const updatedData = [...prevChartData.datasets[0].data];
-        const updatedLabels = [...prevChartData.labels];
+        setChartData((prevChartData) => {
+          const updatedData = [...prevChartData.datasets[0].data];
+          const updatedLabels = [...prevChartData.labels];
 
-        // Thêm dữ liệu mới
-        updatedData.push(altitude);
-        updatedLabels.push(currentTime);
+          updatedData.push(altitude);
+          updatedLabels.push(recordTime);
 
-        // Giữ dữ liệu trong giới hạn MAX_TIME_SECONDS
-        if (updatedData.length > MAX_TIME_SECONDS) {
-          updatedData.shift();
-          updatedLabels.shift();
-        }
+          while (
+              updatedLabels.length > 0 &&
+              new Date(updatedLabels[0]).getTime() <
+              new Date(recordTime).getTime() - MAX_TIME_SECONDS * 1000
+              ) {
+            updatedData.shift();
+            updatedLabels.shift();
+          }
 
-        return {
-          ...prevChartData,
-          labels: updatedLabels,
-          datasets: [
-            {
-              ...prevChartData.datasets[0],
-              data: updatedData,
-            },
-          ],
-        };
-      });
+          return {
+            ...prevChartData,
+            labels: updatedLabels,
+            datasets: [
+              {
+                ...prevChartData.datasets[0],
+                data: updatedData,
+              },
+            ],
+          };
+        });
+      }
     };
 
-    socket.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
+    newSocket.onclose = () => console.log("WebSocket đã đóng");
+    newSocket.onerror = (error) => console.error("Lỗi WebSocket:", error);
 
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
+    setSocket(newSocket);
 
     return () => {
-      socket.close(); // Dọn dẹp kết nối WebSocket
+      newSocket.close();
     };
   }, [selectedDevice]);
 
   return (
-    <div
-      style={{
-        backgroundColor: "#f8f9fa",
-        minHeight: "100vh",
-        padding: "20px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <div style={styles.selectorContainer}>
-        <label htmlFor="deviceSelector" style={styles.selectorLabel}>
-          Select Device:
-        </label>
-        <select
-          id="deviceSelector"
-          value={selectedDevice}
-          onChange={(e) => setSelectedDevice(e.target.value)}
-          style={styles.selectorDropdown}
-        >
-          {devices.map((device) => (
-            <option key={device.deviceName} value={device.deviceName}>
-              {`${device.deviceName} - ${device.location}`}
-            </option>
-          ))}
-        </select>
-      </div>
+      <div style={styles.container}>
+        {/* Dropdown chọn thiết bị */}
+        <div style={styles.selectorContainer}>
+          <label htmlFor="deviceSelector" style={styles.selectorLabel}>
+            Chọn thiết bị:
+          </label>
+          <select
+              id="deviceSelector"
+              value={selectedDevice}
+              onChange={(e) => setSelectedDevice(e.target.value)}
+              style={styles.selectorDropdown}
+          >
+            {devices.map((device) => (
+                <option key={device.id} value={device.id}>
+                  {`${device.deviceName} - ${device.location}`}
+                </option>
+            ))}
+          </select>
+        </div>
 
-      <div style={styles.chartContainer}>
-        <Line
-          data={chartData}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            plugins: {
-              legend: {
-                display: true,
-                position: "top",
-              },
-              tooltip: {
-                enabled: true,
-                callbacks: {
-                  label: (context) => `Altitude: ${context.raw} m`,
+        {/* Biểu đồ */}
+        <div style={styles.chartContainer}>
+          <Line
+              data={chartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                  duration: 0,
                 },
-              },
-              title: {
-                display: true,
-                text: "Real-Time Water Altitude (m)",
-                font: {
-                  size: 18,
-                },
-              },
-            },
-            scales: {
-              x: {
-                title: {
-                  display: true,
-                  text: "Time (hh:mm:ss)",
-                  font: {
-                    size: 14,
+                plugins: {
+                  legend: {
+                    display: true,
+                    position: "top",
+                  },
+                  tooltip: {
+                    enabled: true,
                   },
                 },
-                ticks: {
-                  autoSkip: true,
-                  maxTicksLimit: 10,
-                },
-              },
-              y: {
-                title: {
-                  display: true,
-                  text: "Altitude (m)",
-                  font: {
-                    size: 14,
+                scales: {
+                  x: {
+                    type: "time",
+                    adapters: {
+                      date: {
+                        locale: "en-US",
+                      },
+                    },
+                    time: {
+                      tooltipFormat: "HH:mm:ss",
+                      displayFormats: {
+                        second: "HH:mm:ss",
+                        minute: "HH:mm",
+                      },
+                    },
+                    ticks: {
+                      source: "auto",
+                      autoSkip: true,
+                      maxTicksLimit: 10,
+                    },
+                    min: DateTime.now().minus({ seconds: MAX_TIME_SECONDS }).toISO(),
+                    max: DateTime.now().toISO(),
+                  },
+                  y: {
+                    beginAtZero: true,
                   },
                 },
-                beginAtZero: true,
-                ticks: {
-                  stepSize: 10,
-                },
-              },
-            },
-          }}
-        />
+              }}
+          />
+        </div>
       </div>
-    </div>
   );
 };
 
 const styles = {
+  container: {
+    backgroundColor: "#f8f9fa",
+    minHeight: "100vh",
+    padding: "20px",
+  },
   selectorContainer: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "center",
     marginBottom: "20px",
-    padding: "10px",
-    backgroundColor: "#ffffff",
-    borderRadius: "8px",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
   },
   selectorLabel: {
-    fontSize: "16px",
-    fontWeight: "bold",
     marginRight: "10px",
   },
   selectorDropdown: {
-    padding: "8px 12px",
-    fontSize: "14px",
+    padding: "8px",
+    fontSize: "16px",
     borderRadius: "4px",
     border: "1px solid #ced4da",
-    outline: "none",
-    cursor: "pointer",
-    transition: "border-color 0.2s ease-in-out",
-    width: "300px", // Điều chỉnh độ dài
   },
   chartContainer: {
-    width: "98%",
-    margin: "0 auto",
+    width: "90%",
     height: "70vh",
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    margin: "0 auto",
   },
 };
 
