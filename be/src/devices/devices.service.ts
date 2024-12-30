@@ -21,7 +21,7 @@ export class DevicesService {
     const newDevice = await this.deviceRepository.save(dto);
 
     const apiUrl = 'http://localhost:8080/topic/add';
-    await this.httpService.post(apiUrl, { deviceId: newDevice.id }).toPromise();
+    await this.httpService.post(apiUrl, { deviceId: newDevice.id, location: newDevice.location }).toPromise();
 
     return newDevice;
   }
